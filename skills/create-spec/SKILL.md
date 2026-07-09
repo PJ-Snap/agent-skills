@@ -1,5 +1,5 @@
 ---
-name: create spec
+name: create-spec
 description: Turn a feature idea into a planning-ready spec through rigorous interview, then save it to .cursor/plans/. Use when the user wants to spec out a feature, create a spec, write requirements, or plan a new capability before implementation.
 ---
 
