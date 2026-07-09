@@ -1,5 +1,6 @@
 ---
 name: create-plan
+description: Create a detailed, agent-executable implementation plan from a spec or freeform description. Use when the user wants to plan implementation, write a TDD plan, or turn a spec into actionable tasks before coding.
 disable-model-invocation: true
 ---
 
