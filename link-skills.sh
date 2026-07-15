@@ -9,12 +9,14 @@ declare -A SKILL_TARGETS=(
   [cursor]="$HOME/.cursor/skills"
   [claude]="$HOME/.claude/skills"
   [pi]="$HOME/.pi/agent/skills"
+  [agents]="$HOME/.agents/skills"
 )
 
 declare -A AGENT_TARGETS=(
   [cursor]="$HOME/.cursor/AGENTS.md"
   [claude]="$HOME/.claude/CLAUDE.md"
   [pi]="$HOME/.pi/agent/AGENTS.md"
+  [agents]="$HOME/.agents/AGENTS.md"
 )
 
 abs_path() {
@@ -33,8 +35,7 @@ link_path() {
   if [[ -L "$dest" ]]; then
     rm "$dest"
   elif [[ -e "$dest" ]]; then
-    echo "skip $label: $dest exists and is not a symlink" >&2
-    return 0
+    rm -rf "$dest"
   fi
 
   ln -s "$src" "$dest"
@@ -55,13 +56,13 @@ selected=()
 if [[ $# -gt 0 ]]; then
   for harness in "$@"; do
     if [[ -z "${SKILL_TARGETS[$harness]+x}" ]]; then
-      echo "unknown harness: $harness (expected: cursor, claude, pi)" >&2
+      echo "unknown harness: $harness (expected: cursor, claude, pi, agents)" >&2
       exit 1
     fi
     selected+=("$harness")
   done
 else
-  selected=(cursor claude pi)
+  selected=(cursor claude pi agents)
 fi
 
 if [[ -f "$AGENTS_SRC" ]]; then

@@ -1,33 +1,62 @@
 ---
 name: create-plan
-description: Create a detailed, agent-executable implementation plan from a spec or freeform description. Use when the user wants to plan implementation, write a TDD plan, or turn a spec into actionable tasks before coding.
+description: Create a self-contained, end-to-end TDD implementation prompt from a canonical Lavish plan or freeform description. Use when the user wants an implementation plan that a coding agent can execute directly through vertical RED-GREEN-REFACTOR cycles.
 disable-model-invocation: true
 ---
 
-# Create an implementation plan
+## Plan the implementation
 
-1. Read the attached spec. If no spec exists, ask the user whether to create one with the create-spec skill first or proceed with a freeform description.
+1. Establish the source of truth.
+  - Read the attached canonical Lavish plan.
+  - If no canonical plan exists, ask whether to create one with `create-lavish-plan` or proceed from the freeform description.
+  - When using a canonical plan, preserve its resolved outcome, scope, required behavior, contracts, non-negotiable constraints, and completion conditions. Do not reopen those decisions.
+  - Assign a stable sequential ID (`AC-01`, `AC-02`, ...) to every requirement and acceptance criterion. Preserve each criterion's complete meaning in a concise, independently understandable statement.
+2. Ground the plan in the repository.
+  - Explore the repository to verify user assertions and identify existing architecture, interfaces, test conventions, and relevant patterns.
+  - Read `AGENTS.md` and treat it as the canonical repository convention.
+  - Discover test, lint, type-check, quality, build, and regression commands from `AGENTS.md`, package configuration, task runners, and CI. Verify that every command and tool included in the plan exists; omit checks the repository does not support.
+3. Resolve the implementation design before creating tasks.
+  - Identify the modules, public interfaces, ownership boundaries, dependencies, data contracts, error behavior, and test approach.
+  - Prefer deep modules: simple, stable, testable interfaces that encapsulate substantial functionality.
+  - Design interfaces for testability: inject external dependencies instead of constructing them internally, return results instead of hiding behavior in side effects, isolate unavoidable side effects at system boundaries, and minimize methods and parameters.
+  - If an implementation decision is non-obvious and materially changes architecture, complexity, or a public contract, recommend a choice and ask the user to decide. Otherwise resolve it before writing the plan.
+4. Turn the design into an executable sequence of phases and tasks.
+  - A Phase is an integration and product-capability milestone. It ends with a working,
+   demonstrable system state and a checkpoint.
+  - A Task is a bounded, testable, reviewable change with one explicit ownership boundary, a concrete outcome, and independent verification.
+  - Extract the canonical plan's user flows, observable behaviors, contracts, acceptance criteria, constraints, and risks.
+  - Identify the keystone interfaces: the smallest stable public contracts, schemas, domain operations, or integration boundaries that later work must use.
+  - Order tasks around these keystone interfaces. Establish a contract and its tracer-bullet path before dependent capability, variants, edge cases, or presentation.
+  - Create vertical phases. Each phase must connect every required layer to deliver one observable product capability end-to-end, even when the first version is intentionally narrow.
+  - Never create horizontal phases such as “backend,” “frontend,” “database,” or “tests.” Include the backend, persistence, UI, and tests required for one capability in the same phase.
+  - Give each phase an explicit demonstrable outcome and checkpoint: a named test suite, runnable workflow, API call, UI interaction, migration state, or comparable proof.
+  - Split a phase into tasks only at explicit ownership boundaries. Each task owns one cohesive artifact or behavior, names and verifies every prerequisite contract, and leaves the repository in a testable state.
+  - Map every `AC-*` criterion to at least one task behavior or phase checkpoint. Repeat each mapped criterion's ID and full statement inside every standalone task that owns it.
+  - Put required hardening, variants, and negative paths in the earliest phase where the relevant keystone interface exists.
+  - If a phase cannot demonstrate its capability without a later phase, merge or reorder the phases until it can.
+5. Translate the required behavior into vertical TDD cycles.
+  - Begin each task with one tracer-bullet behavior that proves its public path end-to-end.
+  - Order the remaining behaviors as the smallest useful increments through the same public interface.
+  - Make each behavior one complete RED → GREEN → REFACTOR cycle. Never plan all tests first and implementation afterward.
+  - Specify concrete test setup, the public action, the observable result, and a representative assertion for every behavior.
+  - Test behavior through public interfaces, not implementation details. Tests must survive behavior-preserving refactors.
+  - Mock only external boundaries such as database queries, HTTP calls, file I/O, time, and service clients.
+  - Separate non-TDD work only when no meaningful observable behavior can be tested, and state why.
+6. Produce and validate the executable prompt.
+  - Write direct, imperative instructions to the implementing coding agent.
+  - Make the full output executable end-to-end when pasted into a fresh coding-agent conversation with only repository access.
+  - Also make every task independently executable under the same fresh-agent condition.
+  - Map each task 1:1 to an implementing agent todo item.
+  - Resolve every design decision; do not defer choices to the implementer.
+  - State every prerequisite as an exact artifact and contract with a verification method.
+  - State every behavior so it has a falsifiable observable assertion.
+  - Include exact task verification, phase checkpoints, and execution-time acceptance-conformance commands.
+  - Perform planning-time coverage verification: every `AC-*` criterion maps to concrete implementation behavior and test or checkpoint evidence; no criterion is orphaned, represented only by prose, or deferred without an owning task.
+  - Check execution readiness before emitting: all decisions are resolved; required files, tools, credentials, services, and test environments are available or explicitly identified as prerequisites; no manual input or approval is expected during execution; every task has one ownership boundary and independent verification; and dependencies form an executable sequence. Resolve or split anything that fails these checks.
 
-2. Explore the repo to verify their assertions and understand the current state of the codebase.
 
-3. If working from a spec, treat its Outcome, Architectural Constraints, Interfaces, State Model, and Acceptance Criteria as fixed. Interview only on implementation questions: module boundaries, phasing strategy, test approach, and codebase-specific patterns. When you encounter a non-obvious implementation decision—such as whether to keep it simple (KISS) or introduce abstraction, or which design pattern to use—ask the user for their preference before proceeding and give your recommendation. If working without a spec, interview broadly until you reach a shared understanding.
 
-4. Sketch out the major modules you will need to build or modify to complete the implementation. Actively look for opportunities to extract deep modules that can be tested in isolation.
-
-     A deep module (as opposed to a shallow module) is one which encapsulates a lot of functionality in a simple, testable interface which rarely changes.
-
-5. Once you have a complete understanding of the problem and solution, use the template below to write the plan.
-
-     Optimize output for LLM coding agent:
-     - Explicit task framing
-     - Unambiguous context
-     - Clear outcome intent
-     - Information dense
-     - Each task maps 1:1 to a todo item — the implementing agent creates its todo list directly from the plan's tasks
-     - Every design decision is resolved — no choices deferred to the implementer
-     - Every behavior is falsifiable — if you can't write a pytest assertion for a `Then` clause as written, it's too vague
-
-## Guardrails
+## Plan guardrails
 
 - Keep modules single-responsibility; do not mix unrelated concerns.
 - Minimize inter-component coupling; prefer clear interfaces and boundaries.
@@ -39,268 +68,330 @@ disable-model-invocation: true
 - Validate assumptions against official documentation.
 - Reduce complexity at the source; do not introduce abstraction layers or single-caller wrappers that merely relocate code.
 - Extracted helpers must encapsulate a distinct responsibility or serve multiple callers; avoid trivial pass-throughs and needless indirection.
-- Each task must be self-contained. If a task depends on output from a prior task, state the exact artifact (file, function, class) it expects to exist — do not reference by task number alone.
-- No deferred decisions: never use phrases like "use an appropriate structure", "handle errors gracefully", or "as needed". Replace with the specific choice.
+- Repeat all context, requirements, decisions, constraints, and commands needed by a task inside that task.
+- Define task dependencies by exact artifact and verified contract, never by task number alone.
+- Do not use vague instructions such as “use an appropriate structure,” “handle errors gracefully,” or “as needed.”
+- Treat canonical outcomes, required behavior, public contracts, non-negotiable constraints, exclusions, and completion conditions as immutable. If repository reality conflicts with one, stop and report the blocker; never classify it as an acceptable deviation.
+
+
 
 ## Output
 
-<!-- TEMPLATE START — Emit everything below as the plan output. -->
-<!-- Guidance comments (<!-- ... -->) are instructions for you; do NOT emit them. -->
+<!--
+Emit one complete Markdown implementation prompt from the template below.
+Replace every bracketed placeholder with verified repository-specific content.
+Remove sections and commands that do not apply. Duplicate the phase and task
+templates until the complete implementation is covered. Do not emit these HTML
+comments, unresolved placeholders, references to this skill, the Lavish plan,
+other plan sections, or prior conversation.
+-->
 
-> **TDD Contract:** Each numbered behavior is one RED→GREEN→REFACTOR cycle.
-> Implement them **in order, one at a time**:
-> 1. **RED** — write a failing test for the behavior
-> 2. **GREEN** — write the minimal code to pass it
-> 3. **REFACTOR** — clean up while all tests stay green. **You MUST read and apply the rules in `.cursor/skills/implement-tdd/references/refactoring.md`** during this step.
->
-> Do **not** batch-write tests or batch-write implementation.
 
-### Overview
-<!-- One-liner referencing the spec file path, plus a brief summary of the outcome. If no spec exists, summarize the problem and solution instead. -->
 
-### Current Behavior
-<!-- Brief description of current behavior in the codebase. -->
+# Implement [feature] with vertical TDD
 
-### Architectural Constraints
-<!-- Restate the spec's Architectural Constraints section verbatim. These are inherited and non-negotiable. -->
+Implement this plan end to end. Create one todo item for every task, preserve the
+given order, and continue through all phases without waiting for confirmation
+unless a stated prerequisite is missing or materially different from its
+contract.
 
-### Implementation Decisions
-<!-- Implementation-level decisions: module structure, library choices, codebase patterns.
-     Must not contradict the architectural constraints above. -->
+## Outcome
 
-### File/Directory Structure
-<!-- Show planned files and directories to be created or modified. Files should be small and focused.
-     For each module, state its single responsibility explicitly.
-     Identify ownership boundaries between modules to avoid mixed concerns.
-     Explicitly define where shared helpers, pure functions, and typed containers (dataclasses/models) will reside to prevent monolithic files. -->
+[State the product outcome, implementation scope, and explicit exclusions.]
 
-Frontend example:
-```
-app/                            # Owner: frontend application root; entry point for UI features
-├── feature/                    # Owner: one product/domain feature; avoid cross-feature state/imports
-│   ├── __init__.py
-│   ├── contracts.py            # Sole responsibility: shared typed contracts (TypedDict/dataclass) for this feature
-│   ├── constants.py            # Sole responsibility: feature-scoped constants/enums (no business logic)
-│   └── state/                  # Feature state management only; no rendering concerns
-│   │   ├── state.py            # Sole responsibility: state vars, derived values, and state mutations
-│   └── components/             # UI presentation components only; no domain orchestration
-│   │   ├── ui_component.py     # Sole responsibility: render one UI element from props/state
-│   └── event_handlers/         # Event-to-action adapters; coordinate UI events and state/service calls
-│   │   ├── __init__.py
-│   │   ├── related_handlers.py     # Sole responsibility: related event handlers for a single user flow
-│   │   ├── additional_handlers.py  # Sole responsibility: overflow handlers when one flow outgrows a single file
-│   │   └── tests/
-│   │       ├── __init__.py
-│   │       ├── conftest.py
-│   │       └── test_related_handlers.py     # Sole responsibility: public behavior tests for handler module
-```
+## Acceptance contract
 
-Backend example:
-```
-backend/                        # Owner: all backend features; entry point for server-side logic
-├── feature/                    # Owner: one domain feature; no cross-domain state or imports
-│   ├── __init__.py
-│   └── shared/                 # Cross-feature primatives only
-│   │   ├── constants.py        # Sole responsibility: place for constants and enums used in this module
-│   │   ├── contracts.py        # Sole responsibility: shared TypedDicts/contracts
-│   │   ├── schemas.py          # Sole responsibility: input/output validation contracts (Pydantic)
-│   │   ├── models.py           # Sole responsibility: ORM definitions and DB schema for projects
-│   │   └── utils/              # Cross-feature utilities
-│   │       └── util.py         # Sole responsibility: utility logic
-│   ├── service.py              # Sole responsibility: business logic orchestration consumed by the front-end; calls models and helpers only
-│   └── domain/                 # Sole responsibility: one business logic domain
-│   │   ├── __init__.py
-│   │   ├── domain_logic.py     # Sole responsibility: non-orchestration business logic (rules, validation, calculations)
-│   │   ├── helpers.py          # Sole responsibility: pure, stateless helper functions; no service or model imports
-│   │   └── tests/
-│   │       ├── __init__.py
-│   │       ├── conftest.py
-│   │       ├── test_logic.py      # Tests for business logic.py (public interface only; no internal implementation details)
-│   │       └── test_helpers.py    # Tests for helpers.py (public interface only; no internal implementation details)
-│   └── tests/
-│       ├── __init__.py
-│       ├── conftest.py
-│       └── test_service.py     # Tests for service.py (public interface only; no internal implementation details)
+<!--
+List every canonical requirement and acceptance criterion exactly once. Assign
+stable sequential IDs and preserve each criterion's complete meaning without
+requiring access to the source plan.
+-->
+
+- **AC-01:** [Concise, independently understandable requirement or acceptance criterion]
+- **AC-02:** [Concise, independently understandable requirement or acceptance criterion]
+
+## Planning-time coverage
+
+<!--
+Map every AC ID to at least one implementing behavior or phase checkpoint.
+There must be no orphaned criteria.
+-->
+
+- **AC-01:** Task 1.1, behavior 1; verified by [exact test or Phase 1 checkpoint]
+- **AC-02:** Task 1.1, behavior 2; verified by [exact test or Phase 1 checkpoint]
+
+## Verified repository state
+
+[Describe the relevant current behavior, architecture, test conventions, and existing interfaces.]
+
+## Resolved design
+
+[State every cross-task architectural, contract, dependency, error-handling, testing, and phasing decision.]
+
+## Security
+
+**Threat modeling required:** [Yes | No]
+
+**Rationale:** [State the applicable threats and mitigations, or why threat modeling is unnecessary.]
+
+## Intended structure
+
+<!-- Use the repository's actual layout; include only new or changed paths. -->
+
+```text
+[Show only relevant new or changed paths, with each path's sole responsibility.]
 ```
 
----
 
-### Phases
 
-<!-- Split the work into one or more PRs.
-     Simple changes = single PR. Complex changes = multiple PRs.
-     Order PRs in a keystone-interface pattern: foundational/shared interfaces first, consuming code last. -->
+## Execution rules
 
-#### PR 1 — [Short title]
-<!-- One line describing the functionality delivered by this PR. -->
+- Read `AGENTS.md` before editing and follow all repository instructions.
+- Execute phases and tasks in order. Keep the repository passing between tasks.
+- Use strict vertical TDD: complete one RED → GREEN → REFACTOR cycle for one
+behavior before writing the next test. Never batch tests or implementation.
+- Test observable behavior through public interfaces. Do not assert internal
+calls, private state, or implementation structure.
+- Mock only external boundaries. Keep schemas, data classes, pure helpers, and
+deterministic standard-library behavior real.
+- Implement only enough production code to pass the current test. Do not
+anticipate later behaviors or add speculative abstractions.
+- Never refactor while RED. Run the relevant tests after every refactor step.
+- If a test fails after a behavior-preserving refactor, rewrite the test when it
+asserted implementation details; do not revert valid design improvements.
+- If a planned test passes before implementation, determine whether the behavior
+already exists or the test is ineffective before changing production code.
+- Stop and report a blocker instead of inventing a parallel contract, fallback,
+compatibility shim, or alternate architecture.
 
-**Preserved interfaces** (do not modify)
-<!-- List existing public interfaces, files, or behaviors that MUST remain unchanged in this PR.
-     This prevents the implementing agent from "helpfully" refactoring adjacent code.
-     Omit only if this is a greenfield PR with no existing code to preserve. -->
-- `path/to/existing_module.function_name` — signature and behavior unchanged
-- `path/to/untouched_file.py` — no modifications
 
-##### Task 1.1 — [Short title]
-<!-- One line describing the independently testable and usable behaviour this task delivers. -->
 
-<!-- Describe module boundaries and responsibilities — where new/modified code lives and why.
-     Do NOT prescribe file-level implementation details; the implementing agent determines
-     the minimal code to pass each behavior's test. -->
+## Baseline preflight
 
-**Module context**
-<!-- Which modules/files are involved and their roles. Architectural guidance only —
-     state responsibilities and boundaries, not line-by-line changes.
-     Include import relationships between modules. -->
-- `path/to/module.py` — [responsibility in this task]; imports `ClassName` from `path/to/dependency.py`
-- `path/to/other_module.py` — [responsibility in this task]
+Before editing:
 
-**Public interface under test:**
-<!-- Specify the full signature including parameter types and return type.
-     All behaviors in this task must be asserted via this entry point —
-     never through internal helpers or private methods. -->
-```python
-def function_name(param: ParamType, other: OtherType) -> ReturnType: ...
+1. Read `AGENTS.md`.
+2. Run `git status --short` and preserve all pre-existing changes.
+3. Verify every prerequisite file, contract, dependency, service, credential,
+   and tool named by this prompt.
+4. Run `[exact focused baseline test command]`.
+5. Run `[exact additional baseline command required by this repository]`.
+
+If a required prerequisite is unavailable, a named command does not exist, or
+the relevant baseline is already failing, stop and report the exact blocker.
+Do not modify code to conceal a pre-existing failure.
+
+<!--
+Repeat the phase template for every vertical product-capability milestone. Each
+phase must end in an integrated, demonstrable state and an exact checkpoint.
+-->
+
+## Phase 1 — [Product-capability milestone]
+
+Deliver [working, demonstrable end-to-end capability].
+
+**Acceptance criteria:** [AC-01, AC-02]
+
+**Phase checkpoint:** Demonstrate completion by [exact observable workflow] and
+run `[exact phase-level command]`.
+
+<!--
+Repeat the task template for every task in this phase. Each task must remain
+executable when copied alone into a fresh coding-agent conversation, so repeat
+all applicable context, constraints, TDD rules, and verified commands.
+-->
+
+### Task 1.1 — [Imperative, outcome-oriented title]
+
+Implement [specific observable outcome and why it is required].
+
+Read `AGENTS.md` before editing. Follow all repository instructions and use
+strict vertical TDD exactly as specified below.
+
+Before editing, run `git status --short`, preserve pre-existing changes, verify
+the prerequisite artifacts and tools listed below, and run
+`[exact focused baseline test command]`. If the baseline fails or a prerequisite
+is unavailable, stop and report the blocker without modifying code.
+
+Test only observable behavior through public interfaces. Do not assert private
+state, internal calls, or implementation structure. Mock only external
+boundaries such as database queries, HTTP calls, file I/O, time, and service
+clients; keep schemas, data classes, pure helpers, and deterministic standard
+library behavior real. Never refactor while RED or implement a later behavior
+during the current cycle.
+
+Inspect these repository artifacts first:
+
+- `path/to/module.py::Symbol` — [verified current responsibility and behavior]
+- `path/to/test_file.py::TestClass` — [relevant existing coverage and test pattern]
+- `path/to/example.py::ExampleSymbol` — [repository pattern to preserve]
+
+Deliver:
+
+- [Concrete required behavior or artifact]
+- [Concrete boundary, edge case, or failure behavior]
+- [Explicit exclusion]
+
+Satisfy these acceptance criteria:
+
+- **AC-01:** [Repeat the complete criterion statement]
+- **AC-02:** [Repeat the complete criterion statement]
+
+Use these prerequisite contracts:
+
+- `path/to/dependency.py::Dependency` — [exact signature, schema, behavior, or migration state]
+- Verify this contract with `[exact command or inspection]`.
+- If it is absent or materially different, stop and report the mismatch. Do not
+invent a parallel interface, fallback, compatibility shim, or alternate design.
+
+Make only these changes:
+
+- Create `path/to/new_file.py` to own [single responsibility].
+- Modify `path/to/existing_file.py::Symbol` to [specific change].
+- Add or modify `path/to/test_file.py::TestClass` to verify [public behavior].
+
+Preserve:
+
+- `path/to/preserved.py::PublicSymbol` — keep [signature and behavior] unchanged.
+- Do not modify [specific file, subsystem, contract, or out-of-scope behavior].
+
+Implement this resolved design:
+
+- [Exact ownership and dependency direction]
+- [Exact public interface, types, schemas, errors, and side effects]
+- [Applicable repository constraints stated in full]
+
+Expose and test this public contract:
+
+<!--
+Use the repository language and the contract form appropriate to the task:
+function, class, component, command, endpoint, event, schema, or migration.
+-->
+
+```[language]
+[Exact language-appropriate public signature, schema, route, command, event, or migration contract]
 ```
-in `path/to/module.py`
 
-**Verification:** `pytest path/to/module/tests/test_file.py::TestClassName`
-<!-- Exact command to run to confirm all behaviors in this task pass.
-     Must be specific enough that the agent doesn't guess or run the full suite. -->
+Implement these behaviors in order:
 
-**Behaviors** (implement in order)
-<!-- Each numbered item is one RED→GREEN cycle. Order: tracer bullet first (proves the
-     end-to-end path works), then core happy-path behaviors, then edge cases and error paths.
-     State the ordering rationale in a comment above the list.
+1. **[AC-01] [Tracer-bullet behavior]**
+  - Given [concrete fixture, input, and starting state]
+  - When [exact action through the public interface]
+  - Then [observable result and representative assertion]
+2. **[AC-02] [Next smallest behavior]**
+  - Given [concrete fixture, input, and starting state]
+  - When [exact action through the public interface]
+  - Then [observable result and representative assertion]
 
-     Format each behavior as a pure observable assertion through the public interface,
-     using multi-line Given/When/Then with each clause on its own line.
-     Each clause has TWO parts: plain natural language, then a backtick-quoted literal:
+Use this order because [explain how the tracer bullet proves the path and why
+each later behavior is the next smallest useful vertical increment].
 
-       Given [precondition in natural language] `[starting fixture/state]`
-       When [action in natural language] `[action via public interface]`
-       Then [observable outcome in natural language] `[assertion expression]`
+For each behavior, complete this cycle before starting the next:
 
-     Example:
-       Given one entity node exists at the origin `existing_nodes = [{"id": "n1", "position": {"x": 0, "y": 0}}]`
-       When the delta modifies that node's position `apply_delta(delta, existing_nodes, [])`
-       Then the merged node has the new position `merged_nodes[0]["position"] == {"x": 50, "y": 100}`
+1. **RED**
+  - Write one test for the behavior through the public interface.
+  - Run `[exact focused test command]`.
+  - Confirm it fails for the expected behavioral reason. If it passes, verify
+  whether the behavior already exists or the test is ineffective.
+2. **GREEN**
+  - Write only enough production code to pass the new test.
+  - Run `[exact focused test command]` and confirm it passes.
+  - Do not implement later behaviors during this step.
+3. **REFACTOR**
+  - Refactor only while tests are green.
+  - Remove duplication, improve names and ownership, and simplify the changed
+  code without changing behavior.
+  - Run `[exact focused test command]` after each refactor step.
+  - Verify the test still describes public behavior and would survive another
+  internal refactor.
+  - If a test fails after a behavior-preserving refactor because it asserted an
+  implementation detail, rewrite the test instead of reverting the refactor.
 
-     Rules:
-     - Describe WHAT to verify, not HOW to implement it.
-     - Do NOT describe the implementation that makes the test pass — only the assertion.
-     - Test through the public interface only — never assert on internals.
-     - Each behavior must survive an internal refactor unchanged.
-     - Mark the first behavior as the tracer bullet: it must exercise the full vertical
-       slice (input → logic → output) to prove the path works before building out.
-     - Given clauses must specify CONCRETE state: literal fixture values, specific mock
-       return values, actual data shapes. Not abstract preconditions like "a valid user".
-     - Then clauses must be falsifiable: expressible as a single pytest assertion.
-       If you cannot write `assert <expression>` for it, rewrite it until you can.
-     - No forward references: do not say "uses the X from Task N". Instead name the
-       exact artifact (function, class, file) that must already exist. -->
+<!--
+Include the following section only for changes with no meaningful observable
+behavior to test. Otherwise omit it.
+-->
 
-*Ordering rationale: [explain why this sequence — e.g., "tracer bullet proves the basic path, then add constraint side effects, then boundary/error cases"]*
+After all TDD cycles pass, make these non-TDD changes:
 
-1. **[Tracer bullet]**
-   Given [concrete precondition in natural language] `[starting fixture/state]`
-   When [action in natural language] `[action via public interface]`
-   Then [observable outcome in natural language] `[assertion expression]`
+- [Exact mechanical, configuration, generated, or documentation change and why no meaningful behavior test applies]
 
-2. Given [concrete precondition in natural language] `[starting fixture/state]`
-   When [action in natural language] `[action via public interface]`
-   Then [observable outcome in natural language] `[assertion expression]`
+After all behaviors are green:
 
-3. Given [concrete precondition in natural language] `[starting fixture/state]`
-   When [action in natural language] `[action via public interface]`
-   Then [observable outcome in natural language] `[assertion expression]`
+1. Run `[exact task test command]`.
+2. Run `[exact verified lint or quality command]`.
+3. Run `[exact verified type-check or build command]`.
+4. Run `[exact relevant regression command]`.
 
-**Non-TDD changes** (optional)
-<!-- Changes that cannot be test-driven (e.g., comment/docstring fixes, constants in
-     files with no test runner). List them explicitly so they are not silently omitted.
-     Omit this section if all changes are covered by behaviors above. -->
-- [Description of change and why it is not TDD-able]
+<!--
+Include these deslop steps only when `deslop` was verified as installed and
+supported by the repository. Renumber the emitted list.
 
-##### Task 1.2 — [Short title]
-<!-- Same structure as above. -->
+1. Run `deslop --uncommitted-only --path [exact touched module path]`.
+2. Run `git diff --unified=0` and compare changed line ranges with
+   `.deslop/report.md`.
+3. Fix only findings in lines changed by this task, rerun task tests after each
+   fix, and repeat until no changed-line findings remain.
+-->
 
-**Module context**
-- `path/to/module.py` — [responsibility in this task]; imports `X` from `path/to/dep.py`
+Before completing the task, classify every acceptance criterion owned by this
+task using test or checkpoint evidence:
 
-**Public interface under test:**
-```python
-def function_name(param: Type) -> ReturnType: ...
-```
-in `path/to/module.py`
+- **Implemented** — satisfied as written; cite the passing test or checkpoint.
+- **Missing** — not satisfied; return to RED and complete it.
+- **Blocked** — cannot be completed because a verified prerequisite or fixed
+  contract is unavailable or contradictory; cite the exact blocker and stop.
 
-**Verification:** `pytest path/to/tests/test_file.py::TestClassName`
+Acceptance criteria cannot be classified as Deviated. Report implementation-detail
+deviations separately, and only when they preserve every fixed outcome, required
+behavior, public contract, constraint, exclusion, and completion condition.
 
-**Behaviors** (implement in order)
+Complete the task only when every owned `AC-*` criterion is Implemented, all
+verification commands pass, preserved contracts remain unchanged, and no
+out-of-scope files or behavior were modified. Report criterion evidence, changed
+files, command results, and justified implementation-detail deviations.
 
-*Ordering rationale: [...]*
+<!-- Repeat the task and phase templates until all required behavior is covered. -->
 
-1. **[Tracer bullet]**
-   Given [concrete precondition in natural language] `[starting fixture/state]`
-   When [action in natural language] `[action via public interface]`
-   Then [observable outcome in natural language] `[assertion expression]`
+## Execution-time conformance
 
-2. Given [concrete precondition in natural language] `[starting fixture/state]`
-   When [action in natural language] `[action via public interface]`
-   Then [observable outcome in natural language] `[assertion expression]`
+After all phases, create and complete a final todo named
+`Verify acceptance conformance`:
 
----
+1. Run every phase checkpoint.
+2. Run `[exact full test-suite command]`.
+3. Run `[exact verified repository-wide lint or quality command]`.
+4. Run `[exact verified repository-wide type-check or build command]`.
+5. For every `AC-*` criterion in the Acceptance contract, inspect its
+   planning-time coverage mapping and classify it using concrete test or
+   checkpoint evidence:
+   - **Implemented** — satisfied as written; cite the evidence.
+   - **Missing** — not satisfied; return to the owning task and complete it
+     through RED → GREEN → REFACTOR.
+   - **Blocked** — cannot be completed because a verified prerequisite or fixed
+     contract is unavailable or contradictory; cite the blocker and stop.
+6. Repeat verification after completing every Missing criterion.
+7. Finish only when every acceptance criterion is Implemented. Report each
+   criterion's classification and evidence, changed files, command results, and
+   any implementation-detail deviations.
 
-<!-- Repeat the PR/Task structure for additional PRs as needed. -->
+Never classify an acceptance criterion as Deviated.
 
-#### PR N — [Short title]
-<!-- One line describing the functionality delivered by this PR. -->
-
-**Preserved interfaces** (do not modify)
-- `path/to/module.function` — unchanged
-
-##### Task N.1 — [Short title]
-
-**Module context**
-- `path/to/module.py` — [responsibility]; imports `X` from `path/to/dep.py`
-
-**Public interface under test:**
-```python
-def function_name(param: Type) -> ReturnType: ...
-```
-in `path/to/module.py`
-
-**Verification:** `pytest path/to/tests/test_file.py::TestClassName`
-
-**Behaviors** (implement in order)
-
-*Ordering rationale: [...]*
-
-1. **[Tracer bullet]**
-   Given [concrete precondition in natural language] `[starting fixture/state]`
-   When [action in natural language] `[action via public interface]`
-   Then [observable outcome in natural language] `[assertion expression]`
-
-2. Given [concrete precondition in natural language] `[starting fixture/state]`
-   When [action in natural language] `[action via public interface]`
-   Then [observable outcome in natural language] `[assertion expression]`
-
----
-
-### Security Assessment
-
-**Threat Modeling Required:** [Yes | No]
-
-<!-- Assess if ANY of these conditions are true:
-     - New system, feature, or material architecture changes
-     - Crosses security boundaries (trust, roles, permissions, external/internal)
-     - Increases attack surface (new endpoints, data flows)
-     - Handles sensitive/confidential data
-     - Modifies authentication or authorization
-     - Introduces new attack vectors or invalidates security assumptions
-     - Integrates with external systems or third-party services (e.g., data warehouses, APIs)
-
-     If YES to any → Threat modeling required. Briefly explain which conditions apply. -->
-
-**Rationale:** [Explanation of which conditions apply, or why none do.]
-
-<!-- TEMPLATE END -->
+<!--
+Before returning the generated prompt, verify:
+- no bracketed placeholders or HTML comments remain;
+- every emitted command was discovered in the repository and its tool is available;
+- unsupported lint, type-check, build, quality, or deslop steps were removed;
+- baseline preflight is explicit and preserves pre-existing changes;
+- every phase is vertical and has an observable checkpoint;
+- every task is bounded, independently executable, and contains its own context;
+- every dependency is an exact artifact contract, never a task-number reference;
+- every behavior has a concrete RED failure, public action, and observable assertion;
+- every canonical requirement and acceptance criterion has one stable `AC-*` ID;
+- every `AC-*` ID maps to an owning task behavior or phase checkpoint;
+- every owning standalone task repeats the full criterion statement;
+- execution-time conformance classifies criteria only as Implemented, Missing,
+  or Blocked using concrete evidence; and
+- the full implementation passes the execution-readiness check.
+Rewrite the prompt until every check passes.
+-->
