@@ -88,7 +88,7 @@ other plan sections, or prior conversation.
 
 
 
-# Implement [feature] with vertical TDD
+# Implement [feature]
 
 Implement this plan end to end. Create one todo item for every task, preserve the
 given order, and continue through all phases without waiting for confirmation
@@ -104,21 +104,12 @@ contract.
 <!--
 List every canonical requirement and acceptance criterion exactly once. Assign
 stable sequential IDs and preserve each criterion's complete meaning without
-requiring access to the source plan.
+requiring access to the source plan. Map every AC ID to at least one
+implementing behavior or phase checkpoint; there must be no orphaned criteria.
 -->
 
-- **AC-01:** [Concise, independently understandable requirement or acceptance criterion]
-- **AC-02:** [Concise, independently understandable requirement or acceptance criterion]
-
-## Planning-time coverage
-
-<!--
-Map every AC ID to at least one implementing behavior or phase checkpoint.
-There must be no orphaned criteria.
--->
-
-- **AC-01:** Task 1.1, behavior 1; verified by [exact test or Phase 1 checkpoint]
-- **AC-02:** Task 1.1, behavior 2; verified by [exact test or Phase 1 checkpoint]
+- **AC-01:** [Concise, independently understandable requirement or acceptance criterion] — Task 1.1, behavior 1; verified by [exact test or Phase 1 checkpoint]
+- **AC-02:** [Concise, independently understandable requirement or acceptance criterion] — Task 1.1, behavior 2; verified by [exact test or Phase 1 checkpoint]
 
 ## Verified repository state
 
@@ -306,6 +297,16 @@ For each behavior, complete this cycle before starting the next:
   internal refactor.
   - If a test fails after a behavior-preserving refactor because it asserted an
   implementation detail, rewrite the test instead of reverting the refactor.
+  <!--
+  Include these deslop steps only when `deslop` was verified as installed and
+  supported by the repository.
+  -->
+  - Run `deslop --uncommitted-only --path [exact path edited in this TDD slice]`.
+  - Run `git diff --unified=0` and compare changed line ranges with
+    `.deslop/report.md`.
+  - Fix only findings in lines changed by this TDD slice, rerun
+    `[exact focused test command]` after each fix, and repeat until no
+    changed-line findings remain.
 
 <!--
 Include the following section only for changes with no meaningful observable
@@ -322,17 +323,6 @@ After all behaviors are green:
 2. Run `[exact verified lint or quality command]`.
 3. Run `[exact verified type-check or build command]`.
 4. Run `[exact relevant regression command]`.
-
-<!--
-Include these deslop steps only when `deslop` was verified as installed and
-supported by the repository. Renumber the emitted list.
-
-1. Run `deslop --uncommitted-only --path [exact touched module path]`.
-2. Run `git diff --unified=0` and compare changed line ranges with
-   `.deslop/report.md`.
-3. Fix only findings in lines changed by this task, rerun task tests after each
-   fix, and repeat until no changed-line findings remain.
--->
 
 Before completing the task, classify every acceptance criterion owned by this
 task using test or checkpoint evidence:
@@ -363,8 +353,8 @@ After all phases, create and complete a final todo named
 3. Run `[exact verified repository-wide lint or quality command]`.
 4. Run `[exact verified repository-wide type-check or build command]`.
 5. For every `AC-*` criterion in the Acceptance contract, inspect its
-   planning-time coverage mapping and classify it using concrete test or
-   checkpoint evidence:
+   ownership mapping and classify it using concrete test or checkpoint
+   evidence:
    - **Implemented** — satisfied as written; cite the evidence.
    - **Missing** — not satisfied; return to the owning task and complete it
      through RED → GREEN → REFACTOR.
