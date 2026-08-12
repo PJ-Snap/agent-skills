@@ -51,10 +51,9 @@
 - No duplicate responsibilities: if a behaviour already has an owning module, changes must go through that module — never introduce a parallel code path that bypasses it
 - Code patterns are consistent with surrounding codebase
 
-
-
 ## Testing instructions
 
+- Tests for removed functionality are deleted; new and remaining tests cover only retained and newly introduced behavior.
 - Each test function is named `test_<who/what>_<expected_outcome>_<condition>`. Related tests are grouped in classes named `TestFunctionOrFeature`.
 - Every test body follows Arrange-Act-Assert with comment separators. Contains no control flow (`if`, `for`, `while`) — conditional logic hides which path ran and obscures failures.
 - Each test asserts one behavior. Input variations of the same behavior use `@pytest.mark.parametrize`, never duplicate test functions or loops.
