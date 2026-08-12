@@ -1,14 +1,16 @@
-
 ## Code Style Guidelines
 
 **Architecture & Design**
-- Code addresses current requirements only; simplest working solution first
+
+- A durable end-state, clean architecture is prioritised over the short-term diff.
+- Compatibility shims are not retained; affected callers are updated directly
 - Existing codebase patterns and conventions are followed
 - Dependencies require clear justification before introduction
 - Abstraction layers are deferred until proven necessary
 - Files maintain clear separation of concerns
 
 **Function Design**
+
 - Functions are pure (no side effects), with a single responsibility
 - Names are descriptive for functions, variables, and parameters
 - Function behaviour matches its name exactly
@@ -18,6 +20,7 @@
 - Functions follow composition over inheritance
 
 **Clean Code**
+
 - Nested conditions and loops are flattened where possible
 - Dead code, commented-out code, and "removed" notes are deleted
 - Common logic is extracted into shared functions
@@ -28,6 +31,7 @@
 - Comments and docstrings are kept super minimal — added only when truly beneficial (non-obvious *why*, a gotcha, an invariant), never to narrate what the code already says; no comment beats a comment that just narrates
 
 **Data Structures & Types**
+
 - Immutable data structures are preferred; mutable state is minimised
 - Pydantic v2 is used for external/untrusted data (APIs, JSON, user input)
 - Frozen dataclasses or TypedDict are used for internal trusted data
@@ -38,6 +42,7 @@
 - Imports are at module level unless lazy loading is justified
 
 **Quality & Reliability**
+
 - Edge cases and errors are handled consistently
 - Fail fast. No fallback paths unless explicitly required: no broad catches, retries, `or default`, empty/placeholder returns, or alternate paths that hide failure. Fix the root cause. Model valid absence explicitly; surface expected errors as typed, tested states.
 - Test coverage is maintained or improved
@@ -46,91 +51,6 @@
 - No duplicate responsibilities: if a behaviour already has an owning module, changes must go through that module — never introduce a parallel code path that bypasses it
 - Code patterns are consistent with surrounding codebase
 
-**Prompt Design**
-- Prompts are as short as possible while remaining understandable and effective; avoid token bloat
-- Prompt-level branching, optional detail, and format variation belong in `.j2` templates using Jinja
-- Python prepares typed, display-ready prompt inputs; it does not assemble prompt wording or duplicate template logic
-
-**Project Structure**
-
-Use feature-based organization to group related functionality together, making it easier to:
-- **Locate related code** - All files for a feature are in one directory
-- **Understand dependencies** - Clear boundaries between features
-- **Scale applications** - Add new features without touching existing ones
-- **Maintain code** - Changes to a feature are isolated to its directory
-- **Reuse features** - Features can be moved or duplicated easily
-
-### Directory Structure
-
-```
-app/
-├── app.py                      # Main app module with rx.App() instance
-├── pages/                      # Page composition layer
-│   ├── __init__.py
-│   └── index.py                # Composes features into a page
-├── features/                   # Feature modules (organized by domain)
-│   ├── project_menu/
-│   │   ├── __init__.py
-│   │   ├── component.py       # UI components for this feature
-│   │   ├── constants.py       # Feature-specific constants and enums
-│   │   ├── event_handlers.py  # Decentralized event handlers
-│   │   └── state.py           # Feature-specific state
-│   ├── diagrams/
-│   │   ├── __init__.py
-│   │   ├── list_component.py  # Multiple components allowed
-│   │   ├── card_component.py
-│   │   ├── constants.py       # Feature-specific constants and enums
-│   │   ├── event_handlers.py
-│   │   └── state.py
-│   └── shared/                # Shared utilities across features
-│       ├── __init__.py
-│       ├── auth_state.py      # Shared authentication state
-│       ├── constants.py       # Shared constants across features
-│       └── layouts.py         # Shared layout components
-├── config/                     # App-wide configuration
-│   └── config.py
-
-backend/                        # Backend services (outside app/)
-├── projects/                   # Project management
-│   ├── __init__.py
-│   ├── models.py              # PROJECTS model
-│   ├── schemas.py             # Project schemas
-│   └── tests/
-│       ├── __init__.py
-│       ├── conftest.py
-│       └── test_models.py
-├── settings/                   # Project settings
-│   ├── __init__.py
-│   ├── models.py              # SETTINGS model (stores encrypted credentials)
-│   ├── schemas.py             # SettingsContentSchema
-│   ├── service.py             # Credential encryption/decryption CRUD
-│   └── tests/
-├── data_warehouses/            # External data warehouse integration
-│   ├── __init__.py
-│   ├── base/                  # Shared abstractions
-│   │   ├── __init__.py
-│   │   └── schemas.py         # DatabaseCredentialsSchema
-│   ├── snowflake/             # Snowflake-specific
-│   │   ├── __init__.py
-│   │   ├── schemas.py         # SnowflakeCredentialsSchema
-│   │   └── connection_testing.py  # test_snowflake_connection()
-│   └── tests/
-└── shared/                     # Shared backend utilities
-    ├── __init__.py
-    ├── constants.py            # JSON_SIZE_LIMIT_SMALL/LARGE, DDL_SIZE_LIMIT
-    ├── models/
-    │   └── models.py           # TenantAuditMixin, TZDateTime
-    └── utils/
-        ├── __init__.py
-        ├── encryption.py       # encrypt_data, decrypt_data
-        ├── db_helpers.py       # tenant_session for RLS
-        ├── json_validation.py  # validate_json_size, validate_text_size
-        └── tests/
-            ├── __init__.py
-            ├── conftest.py
-            ├── test_db_helpers.py
-            └── test_encryption.py
-```
 
 
 ## Testing instructions
@@ -146,3 +66,4 @@ backend/                        # Backend services (outside app/)
 - Each test class or logical block includes a comment: `# Why this test survives refactoring: <one sentence>`.
 - Test files live in a `tests/` directory colocated with the code under test.
 - Tests target business-logic-dense code: complex conditionals, state transitions, calculations, error paths, edge cases. Trivial pass-through code is not tested.
+
