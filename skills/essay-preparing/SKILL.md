@@ -42,19 +42,19 @@ In 2–3 lines, restate:
 
 Flag if the brain dump pulls away from the answer. Ask whether to narrow or revise the answer before grouping.
 
-### 2. Group related ideas
+### 2. Group related notes
 
 From the brain dump:
 
-- Cluster related points, examples, and asides
+- Cluster notes that belong near each other for later attachment under claims
 - Drop or park noise (duplicates, off-thesis tangents) in a short **Parked** list — do not discard silently
-- Prefer fewer strong groups over many thin ones
+- A cluster is a pile of notes, not a claim
 
+### 3. Turn notes into claims
 
+Write claims from the notes. One cluster may yield several claims. Attach supporting notes under each claim; the cluster does not set how many claims you write.
 
-### 3. Turn each group into a claim
-
-Each group becomes **one claim**, not a topic label.
+Each claim is one assertion, not a topic label.
 
 
 | Weak (topic)   | Strong (claim)                                                   |
@@ -69,7 +69,7 @@ Claims should be:
 - **Useful** — true, important, and as strong as honesty allows ([Paul Graham](https://paulgraham.com/useful.html): useful writing is bold but true; avoid vague correctness)
 - **Sayable** — something they'd say out loud to a friend ([Jason Fried](https://tryathens.com/blog/jason-fried-writing-advice): clear writing = clear thinking; just say it)
 
-One claim = one Why. If Why needs two answers, write two claims.
+A claim is one assertion a reader can accept or reject as a whole. If they could accept half and reject half, write two claims.
 
 ### 4. Order the claims
 
@@ -157,15 +157,11 @@ Claim → The point I am trying to prove is...
 
 Why → This is true because...
 
-Example → A good example of this is...
+Evidence → A good example of this is...
 
-Evidence → Evidence for this can be seen in...
+Meaning → This means that...
 
-Interpretation → This tells us that...
-
-So what → This matters because...
-
-Thesis connection → This supports my overall argument because...
+Connection → This supports my overall thesis because...
 
 
 2. [Claim]
@@ -185,15 +181,11 @@ Claim → The point I am trying to prove is...
 
 Why → This is true because...
 
-Example → A good example of this is...
+Evidence → A good example of this is...
 
-Evidence → Evidence for this can be seen in...
+Meaning → This means that...
 
-Interpretation → This tells us that...
-
-So what → This matters because...
-
-Thesis connection → This supports my overall argument because...
+Connection → This supports my overall thesis because...
 
 
 ORDERING RATIONALE

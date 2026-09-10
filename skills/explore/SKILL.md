@@ -56,6 +56,7 @@ that deepen the current conversation.
 
 - Problem or opportunity, evidence, affected users, and why the change matters.
 - Desired outcome, success measures, scope, and explicit non-goals.
+- Use concrete example workflows to explain the intended experience.
 - New behavior, changed behavior, removed behavior, and breaking changes.
 - Affected code, APIs, events, data, dependencies, integrations, and operations.
 
@@ -79,8 +80,9 @@ dependencies.
 - Material technical decisions with rationale and alternatives considered.
 - Cross-cutting concerns: error handling, security, performance, observability,
 migration, and rollback.
-- Risks, mitigations, and a feasible implementation path without unresolved user
-decisions.
+- Risks, mitigations, and a feasible path for decided work. Preserve flexibility
+around unresolved choices by describing the outcomes and constraints that any
+eventual solution should satisfy.
 
 
 
@@ -93,6 +95,7 @@ whether two planning agents given the conversation would converge on:
 - the same capability inventory and compatibility impact;
 - the same observable requirements, scenarios, and acceptance conditions;
 - the same non-negotiable architecture, contracts, constraints, and migration;
+- the same outcomes and constraints for unresolved choices;
 - materially equivalent implementation work and dependency order.
 
 If unresolved questions would produce materially different plans, surface the
@@ -105,7 +108,8 @@ likely impact rather than inventing certainty.
 When the user asks to capture the exploration or agrees that it is ready,
 produce one standalone description. Preserve all material decisions from the
 conversation and repository investigation. Include unresolved questions and
-residual uncertainty explicitly.
+residual uncertainty explicitly. Capture unresolved choices as the outcomes and
+constraints that any eventual solution should satisfy.
 
 ## Guardrails
 
