@@ -41,24 +41,36 @@ invoke it.
 
 ### 2. Select and bound the increment
 
-1. Follow the user's stated priority. Otherwise compare a few plausible next
-   outcomes and select one on value, consequential uncertainty, and actual
-   dependencies.
-2. Prefer a representative vertical behaviour that exercises important
-   boundaries.
+1. Follow the user's stated priority. Otherwise compare plausible outcomes
+   across supported scenarios and delivery boundaries: a complete user workflow
+   for a narrower scenario, a complete backend or service capability with a
+   named immediate consumer, or a focused prerequisite. Select on value,
+   consequential uncertainty, and actual dependencies; do not assume every
+   increment must include frontend delivery.
+2. Define the increment type and terminal state after merge. A user-facing slice
+   must deliver an independently useful outcome; a backend capability or other
+   prerequisite must be complete and verifiable at its consumer boundary.
+   Crossing technical layers alone does not establish a useful vertical slice.
+   Split a workflow at an intermediate stage only when that stage has independent
+   value or supplies a complete prerequisite for a named immediate consumer.
 3. Aim for one coherent PR that can be verified and safely merged onto the
    current baseline. Include the failure handling, security, data integrity,
    and compatibility the selected behaviour requires; a feature flag leaves
    those invariants intact.
 4. Choose a focused prerequisite when it genuinely unlocks the next outcome,
-   and name its immediate consumer.
+   and name its immediate consumer. State what that consumer can use after merge
+   and which product integration remains deferred; backend foundation work need
+   not introduce a partially usable frontend.
 5. Recommend a bounded investigation — question, evidence needed, stopping
    condition — when an unknown prevents credible scoping.
 6. Size by conceptual complexity and verification burden rather than line
-   counts or agent coding speed. Keep tightly coupled behaviour together;
-   leave unrelated cleanup and speculative infrastructure out.
-7. Narrow the supported scenario, or select the smallest useful prerequisite,
-   when the increment remains too large.
+   counts or agent coding speed. Explain the concrete complexity that makes a
+   broader candidate unsuitable, accounting for shared work that a smaller slice
+   would still require. Keep tightly coupled behaviour together; leave unrelated
+   cleanup and speculative infrastructure out.
+7. Narrow the supported scenario or change the delivery boundary when necessary
+   to retain a complete outcome; alternatively select the smallest useful
+   prerequisite. Do not cut workflow stages solely to reduce size.
 8. Check active changes so the increment stays clear of work already in
    flight, and treat unmerged changes as unavailable. State the intended
    baseline and real dependencies, distinguishing an agreed dependency from a
@@ -79,11 +91,15 @@ invoke it.
 
 ## Output
 
-Give a brief selection rationale, then one copyable Markdown block addressed
-to `openspec-propose`, normally under 400 words:
+Give a brief selection rationale explaining why this boundary is preferable to
+the plausible alternatives, then one copyable Markdown block addressed to
+`openspec-propose`, normally under 400 words:
 
 ```markdown
 Scope this change: <short descriptive title>
+
+Increment type and terminal state: <user-facing outcome, backend/service
+capability, or prerequisite; what is complete and usable after merge and by whom>
 
 Outcome: <one observable behaviour, or a concrete prerequisite and its purpose>
 
