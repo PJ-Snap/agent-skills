@@ -1,17 +1,17 @@
 ---
-name: gather-requirements
+name: openspec-shape
 description: >-
   Gathers product and feature requirements through an exploration interview,
   asking questions that resolve uncertainties that could materially change the
   product or its architecture, then writes a destination brief. Use when the
-  user invokes gather-requirements, wants to gather requirements, run a
+  user invokes openspec-shape, wants to gather requirements, run a
   requirements interview, write a product brief, or capture who a feature
   serves, essential capabilities, and concrete workflows before design or
   planning. Not for open-ended explore without a brief, and not for
   implementation planning.
 ---
 
-Enter gather-requirements. Think deeply, visualize freely, and follow the
+Enter openspec-shape. Think deeply, visualize freely, and follow the
 conversation wherever it goes. Be a thought partner through the interview: no
 fixed steps or required sequence. Read and diagnose freely. Produce the
 destination brief when it is ready; leave implementation to later discovery.
