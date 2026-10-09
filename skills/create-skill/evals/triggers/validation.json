@@ -1,0 +1,8 @@
+[
+  {"query": "i keep explaining our odd csv reconciliation rules to the agent. can you turn the notes into a skill folder?", "should_trigger": true},
+  {"query": "Review the behavior of this existing Agent Skill on malformed inputs and suggest measured improvements.", "should_trigger": true},
+  {"query": "Our report skill fires on ordinary proofreading requests. Help tune its activation boundary using realistic test queries.", "should_trigger": true},
+  {"query": "Generate a Jinja template for a prompt that summarizes customer feedback.", "should_trigger": false},
+  {"query": "Implement an onboarding wizard in our application using docs/onboarding.md.", "should_trigger": false},
+  {"query": "Use the release-audit skill to check today's deployment.", "should_trigger": false}
+]

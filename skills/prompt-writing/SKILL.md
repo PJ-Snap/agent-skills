@@ -1,10 +1,9 @@
 ---
-name: design-prompt
+name: prompt-writing
 description: Author or improve LLM prompts and Jinja prompt templates. Use when the user asks to write, design, refactor, review, or tighten a prompt, system prompt, Jinja section, or prompt template.
-disable-model-invocation: true
 ---
 
-# Design Prompt
+# Prompt Writing
 
 Apply the principles below when creating/editing prompts.
 

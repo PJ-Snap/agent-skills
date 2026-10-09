@@ -1,0 +1,6 @@
+[
+  {"query": "Take PR #902 through the remaining checks and feedback so it's ready to land.", "should_trigger": true},
+  {"query": "Prepare this open PR for merge, with sound tests and finished OpenSpec housekeeping.", "should_trigger": true},
+  {"query": "Archive the already-verified OpenSpec change payment-audit.", "should_trigger": false},
+  {"query": "Why did the CI job fail? Give me a diagnosis only.", "should_trigger": false}
+]

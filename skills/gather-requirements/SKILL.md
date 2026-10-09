@@ -60,7 +60,7 @@ and functions to later discovery.
 
 ## Readiness
 
-The brief is ready when two readers of the interview would share:
+The brief is ready when two readers of the interview would agree on:
 
 - who it serves, the problem, and what a successful experience enables;
 - the essential capabilities and constraints;

@@ -1,0 +1,8 @@
+[
+  {"query": "Make PR #318 merge ready.", "should_trigger": true},
+  {"query": "Finish this PR: evaluate the bot feedback, fix CI, and close out its OpenSpec change.", "should_trigger": true},
+  {"query": "Get this pull request over the line, including cleaning up the AI-written tests.", "should_trigger": true},
+  {"query": "Audit the tests on this branch against the specs. Leave the PR alone.", "should_trigger": false},
+  {"query": "Review this diff and report findings without modifying anything.", "should_trigger": false},
+  {"query": "Merge this already-approved PR now.", "should_trigger": false}
+]

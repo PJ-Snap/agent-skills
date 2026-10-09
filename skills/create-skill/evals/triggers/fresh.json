@@ -1,0 +1,6 @@
+[
+  {"query": "Capture what worked in the data-cleaning task we just finished as a reusable Agent Skills package.", "should_trigger": true},
+  {"query": "Compare v1 and v2 of my existing skill on real outputs and keep the version with the better quality and token-cost tradeoff.", "should_trigger": true},
+  {"query": "Polish the marketing description of our team's agent-skills product.", "should_trigger": false},
+  {"query": "Install the existing PDF skill from this repository into my agent's skill directory.", "should_trigger": false}
+]

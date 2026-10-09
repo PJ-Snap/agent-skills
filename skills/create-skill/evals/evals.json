@@ -1,0 +1,56 @@
+{
+  "skill_name": "create-skill",
+  "evals": [
+    {
+      "id": "grounded-creation",
+      "prompt": "Create a settlement reconciliation skill at .agents/skills/reconcile-settlements from the attached operating notes. It should produce a local discrepancy report from exported settlement data. Use prompt-writing for its instructions and make the result usable by another agent.",
+      "expected_output": "A valid, concise Agent Skills package preserving the supplied reconciliation rules, with usable resource links and reusable evaluation cases. Validation claims reflect checks actually performed.",
+      "files": ["evals/files/settlement-notes.md"],
+      "assertions": [
+        "The skill folder and frontmatter name agree and the frontmatter satisfies the Agent Skills specification.",
+        "The generated guidance uses closed settlements, existing business_date values, integer minor units, and partner-specific tolerances as defined in the notes.",
+        "The agent can discover the tolerance reference before making comparison decisions.",
+        "The package produces the requested local report within the supplied scope.",
+        "The reusable cases include an observable check for a non-obvious reconciliation rule.",
+        "Reported evaluation outcomes have corresponding execution evidence, or are clearly identified as untested."
+      ]
+    },
+    {
+      "id": "simplify-from-feedback",
+      "prompt": "Improve the attached draft of reconcile-settlements using the operating notes and reviewer feedback. Normal runs currently waste effort generating presentation files, and Cedar discrepancies are misclassified. Produce an updated package at .agents/skills/reconcile-settlements and evidence of the checks you can run.",
+      "expected_output": "An updated package that fixes the owning reconciliation guidance, limits normal work to the requested discrepancy report, and retains critical domain rules. The prior draft remains available for a controlled comparison.",
+      "files": ["evals/files/settlement-notes.md", "evals/files/settlement-skill-draft.md"],
+      "assertions": [
+        "Cedar tolerance uses the operating notes' value rather than the draft's universal tolerance.",
+        "Normal reconciliation requests produce a discrepancy report without requiring unrelated presentation or email artifacts.",
+        "Closed-state selection, integer minor units, and authoritative business_date handling remain present in executable guidance.",
+        "The prior draft is preserved outside the installable result for comparison.",
+        "Acceptance checks concern observable reconciliation behavior rather than required headings or exact instructional wording."
+      ]
+    },
+    {
+      "id": "description-only-without-runner",
+      "prompt": "Tune only the frontmatter description of the attached skill draft. It currently attracts requests to edit Excel formulas and misses settlement reconciliation requests phrased as matching partner payouts. This environment permits file authoring and static validation; live agent execution and activation tracing are unavailable. Produce a candidate package at .agents/skills/reconcile-settlements with reusable trigger queries and explain the evidence available.",
+      "expected_output": "A narrowly targeted candidate description, with the existing body unchanged and realistic positive and near-miss negative queries. Runtime activation improvements remain explicitly unmeasured.",
+      "files": ["evals/files/settlement-skill-draft.md"],
+      "assertions": [
+        "The body of the supplied skill remains unchanged.",
+        "The candidate description connects partner payout matching to settlement reconciliation and fits the specification's length limit.",
+        "Trigger queries cover indirect reconciliation requests and nearby spreadsheet tasks outside the skill's scope.",
+        "Training and validation queries contain both intended activation labels.",
+        "The report identifies automatic activation as unmeasured and supplies no invented rates or benchmark gains."
+      ]
+    },
+    {
+      "id": "required-authoring-dependency",
+      "prompt": "Create a settlement reconciliation skill from the attached notes. In this target environment, prompt-writing is absent from the skill catalog and its files are unavailable. Inspect the available material and report what is needed to complete authoring.",
+      "expected_output": "A precise account of the missing authoring dependency, with useful inspection of the supplied task and an explicit pending state for prompt writing.",
+      "files": ["evals/files/settlement-notes.md"],
+      "assertions": [
+        "The result identifies prompt-writing as the required unavailable authoring dependency.",
+        "The result does not claim the required skill or its template was read.",
+        "The result keeps authoring pending while preserving the requested reconciliation scope."
+      ]
+    }
+  ]
+}

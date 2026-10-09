@@ -1,0 +1,8 @@
+[
+  {"query": "Can you sort out everything blocking merge on PR #27?", "should_trigger": true},
+  {"query": "This PR has reviewer comments and failed checks. Resolve them and make it mergeable.", "should_trigger": true},
+  {"query": "Make the existing PR ready for me to merge; its specs haven't been archived yet.", "should_trigger": true},
+  {"query": "Explain whether this one review comment is right.", "should_trigger": false},
+  {"query": "Run OpenSpec verify for add-export and report its findings.", "should_trigger": false},
+  {"query": "Implement this feature and open a pull request.", "should_trigger": false}
+]

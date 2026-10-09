@@ -1,0 +1,12 @@
+[
+  {"query": "Create an Agent Skill for our release checklist from docs/release-runbook.md.", "should_trigger": true},
+  {"query": "We've repeated this onboarding workflow three times. Package the corrections into reusable agent instructions loaded only when onboarding a partner.", "should_trigger": true},
+  {"query": "The incident-summary skill keeps missing timestamps. Improve its SKILL.md using these execution logs.", "should_trigger": true},
+  {"query": "Can you benchmark my invoice-extraction skill against running the agent without it?", "should_trigger": true},
+  {"query": "skills/release-audit activates when I ask for a changelog, but never for checking a rollout. Fix its description and test the triggers.", "should_trigger": true},
+  {"query": "Make my support-ticket classification system prompt shorter while preserving its labels.", "should_trigger": false},
+  {"query": "Write a README describing the command-line tools in this repository.", "should_trigger": false},
+  {"query": "Add a retry policy to the application function named create_skill.", "should_trigger": false},
+  {"query": "Help me learn the skills I need for backend engineering.", "should_trigger": false},
+  {"query": "Update AGENTS.md with our new Python import conventions.", "should_trigger": false}
+]
